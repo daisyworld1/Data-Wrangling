@@ -1,4 +1,4 @@
-This is a data wrangling exercise using a data set various attributes of passengers on the Titanic, including who survived and who didn’t.
+This is a data wrangling exercise using a data set with various attributes of passengers on the Titanic, including who survived and who didn’t.
 
 I have performed the following steps to clean up the data set:
 
