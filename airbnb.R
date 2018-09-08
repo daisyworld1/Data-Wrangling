@@ -45,16 +45,27 @@ arrange(devise_type,desc(n))
 sum(devise_type$n)
 
 device_table <-  data_frame(
- first_device_type = c("Mac Desktop","Windows Desktop", "iPhone", "iPad" , "Android Phone", "Android Tablet ","Desktop (Other)","SmartPhone (Other)"),
- device_type = c("Desktop","Desktop","Portable","Portable","Portable", "Portable","Desktop","Portable"))
+  first_device_type = c("Mac Desktop","Windows Desktop", "iPhone", "iPad" , "Android Phone", "Android Tablet ","Desktop (Other)","SmartPhone (Other)"),
+  device_type = c("Desktop","Desktop","Portable","Portable","Portable", "Portable","Desktop","Portable"))
  
 train_user <- left_join(train_user, device_table, by = "first_device_type", copy = "device_table")
 train_user$device_type[is.na(train_user$device_type)] <- "others"
+
 
 #bring in the name of each language code. "language_code.csv" came from the google search
 language_code <- read.csv(file="language_code.csv",header=TRUE,sep=",")
 train_user <- left_join(train_user, language_code, by = "language", copy = "language_code")
 
+#add primary_language to country_destination
+destination_language <-  data_frame(
+  country_destination = c("US", "FR", "IT", "GB", "ES", "CA", "DE", "NL", "AU","PT"),
+  country_primary_language = c("English", "French", "Italian", "English", "Spanish", "English", "German", "Dutch", "English","Portuguese"))
 
+train_user <- left_join(train_user, destination_language, by = "country_destination", copy = "destination_language")
+train_user$country_primary_language [is.na(train_user$country_primary_language)] <- "others"
 
+#calculate the time difference between date_account_created and date_first_booking
+train_user$time_diff <- as.Date(train_user$date_first_booking,"%Y-%m-%d") - as.Date(train_user$date_account_created,"%Y-%m-%d")
+
+write.csv2(train_user, file = "train_user_clean.csv")
 
