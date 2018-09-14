@@ -1,4 +1,4 @@
-Airbnb New User Bookings
+##Airbnb New User Bookings
 
 This is a summary document of the important steps taken to cleanup data from Kaggle Airbnb challenge. 
 
