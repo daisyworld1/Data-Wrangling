@@ -1,6 +1,6 @@
 read.csv(file="train_users_2.csv", header=TRUE, sep=",")
 library(tidyr)
-library(dplyer)
+library(dplyr)
 
 #categorize different ages
 
