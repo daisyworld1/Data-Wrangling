@@ -3,6 +3,9 @@ library(tidyr)
 library(dplyr)
 
 #categorize different ages
+train_user <- read.csv(file="train_users_2.csv", header=TRUE, sep=",")
+
+#categorize different ages
 
 age_cat <- as.numeric(train_user$age)
 age_cat[is.na(age_cat)] <- -1
@@ -20,6 +23,8 @@ train_user$age_cat <- as.character(train_user$age_cat)
 train_user$age_cat <- ifelse(train_user$age_cat == 7, "under 18", train_user$age_cat)
 train_user$age_cat <- ifelse(train_user$age_cat == -1, "-unknown-", train_user$age_cat)
 
+#create a new variable gender_age
+train_user$gender_age <- paste(train_user$gender, train_user$age_cat)
 #categorize browser type
 browser_type <- as.character(train_user$first_browser)
 
@@ -33,21 +38,21 @@ sum(unique_browser$n)
 browser_table <-  data_frame(
   first_browser = c("Chrome","Chrome Mobile", "Safari", "Safari Mobile", "Firefox", "IE"),
   browser_type = c("Chrome","Chrome","Safari","Safari","Firefox", "IE"))
-  
+
 train_user <- left_join(train_user, browser_table, by = "first_browser", copy = "browser_table")
 train_user$browser_type[is.na(train_user$browser_type)] <- "others"
 
 #view unique devise type
 device_type <- train_user %>% 
- group_by(first_device_type) %>% 
- tally()
+  group_by(first_device_type) %>% 
+  tally()
 arrange(devise_type,desc(n))
 sum(devise_type$n)
 
 device_table <-  data_frame(
   first_device_type = c("Mac Desktop","Windows Desktop", "iPhone", "iPad" , "Android Phone", "Android Tablet ","Desktop (Other)","SmartPhone (Other)"),
   device_type = c("Desktop","Desktop","Portable","Portable","Portable", "Portable","Desktop","Portable"))
- 
+
 train_user <- left_join(train_user, device_table, by = "first_device_type", copy = "device_table")
 train_user$device_type[is.na(train_user$device_type)] <- "others"
 
@@ -55,6 +60,7 @@ train_user$device_type[is.na(train_user$device_type)] <- "others"
 #bring in the name of each language code. "language_code.csv" came from the google search
 language_code <- read.csv(file="language_code.csv",header=TRUE,sep=",")
 train_user <- left_join(train_user, language_code, by = "language", copy = "language_code")
+names(train_user)[names(train_user) == 'ï..language_full'] <- 'language_full'
 
 #add primary_language to country_destination
 destination_language <-  data_frame(
@@ -63,9 +69,8 @@ destination_language <-  data_frame(
 
 train_user <- left_join(train_user, destination_language, by = "country_destination", copy = "destination_language")
 train_user$country_primary_language [is.na(train_user$country_primary_language)] <- "others"
-
+train_user$language_combo <- paste(train_user$language_full,"-",train_user$country_primary_language)
 #calculate the time difference between date_account_created and date_first_booking
 train_user$time_diff <- as.Date(train_user$date_first_booking,"%Y-%m-%d") - as.Date(train_user$date_account_created,"%Y-%m-%d")
 
 write.csv2(train_user, file = "train_user_clean.csv")
-
